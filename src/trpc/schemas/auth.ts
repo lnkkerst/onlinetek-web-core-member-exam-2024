@@ -2,7 +2,12 @@ import { users } from "@/db/schema";
 import { createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
 
-export const UserModel = createSelectSchema(users);
+export const UserModel = createSelectSchema(users, {
+  email: schema => schema.email.email(),
+  bio: schema => schema.bio.max(1024),
+  name: schema => schema.name.min(1).max(32),
+  phone: schema => schema.phone.min(11).max(11),
+});
 export const UserZod = UserModel.omit({
   hashedPassword: true,
 });

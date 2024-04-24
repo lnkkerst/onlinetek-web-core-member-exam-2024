@@ -1,4 +1,4 @@
-import { name, relations } from "drizzle-orm";
+import { relations } from "drizzle-orm";
 import * as d from "drizzle-orm/pg-core";
 
 export const itemCategories = d.pgTable("item-categories", {
