@@ -13,7 +13,7 @@ export default function RootLayout({
   return (
     <html lang="zh">
       <body>
-        <main className="w-9/10 max-w-[720px] mx-auto my-8">{children}</main>
+        {children}
       </body>
     </html>
   );

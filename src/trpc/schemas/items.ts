@@ -23,7 +23,9 @@ export const ItemsGetZod = PaginationZod.extend({
   order: z.enum(["asc", "desc"]).optional(),
 });
 
-export const CategoryModel = createSelectSchema(itemCategories);
+export const CategoryModel = createSelectSchema(itemCategories, {
+  name: schema => schema.name.min(1).max(64),
+});
 export const CategoryZod = CategoryModel.omit({});
 export const CategoryCreateZod = CategoryZod.omit({
   id: true,
