@@ -1,4 +1,4 @@
 import { uniq } from "lodash-es";
 
 export const prefix = "";
-export const tags = uniq(["all"]);
+export const tags = uniq([]);

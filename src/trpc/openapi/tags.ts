@@ -1,5 +1,4 @@
 export const apiTags = {
-  all: "ALL",
-  frontend1: "frontend1",
+  frontend1: "ITEMS CRUD",
   auth: "AUTH",
 };
