@@ -179,7 +179,10 @@ export const itemsCrudRouter = t.router({
       }
 
       const query = await db.transaction(async tx => {
-        const [total] = await tx.select({ value: count() }).from(items);
+        const [total] = await tx
+          .select({ value: count() })
+          .from(items)
+          .where(and(...andFilter));
 
         const data = await tx
           .select()
