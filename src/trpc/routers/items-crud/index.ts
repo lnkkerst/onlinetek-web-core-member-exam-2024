@@ -6,11 +6,12 @@ import {
   CategoryUpdateZod,
   CategoryZod,
   ItemCreateZod,
+  ItemsGetZod,
   ItemUpdateZod,
   ItemZod,
 } from "@/trpc/schemas/items";
 import { TRPCError } from "@trpc/server";
-import { count, eq } from "drizzle-orm";
+import { and, asc, count, desc, eq, like, SQL } from "drizzle-orm";
 import { z } from "zod";
 import { prefix, tags } from "./index.meta";
 
@@ -144,14 +145,49 @@ export const itemsCrudRouter = t.router({
         tags: tags,
       },
     })
-    .input(z.void())
+    .input(ItemsGetZod)
     .output(withPagination(ItemZod.array()))
-    .query(async ({ ctx }) => {
+    .query(async ({ ctx, input }) => {
       const { db } = ctx;
+      const { page, size, name, lendable, categoryId, sortBy, order } = input;
+
+      const offset = (page - 1) * size;
+      const limit = size;
+
+      let andFilter = [];
+      if (categoryId) {
+        andFilter.push(eq(items.categoryId, categoryId));
+      }
+      if (name) {
+        andFilter.push(like(items.name, `%${name}%`));
+      }
+      if (lendable != undefined) {
+        andFilter.push(eq(items.lendable, lendable));
+      }
+
+      let orderFn: typeof asc = asc;
+      if (order === "desc") {
+        orderFn = desc;
+      }
+
+      let orderBy = orderFn(items.createdAt);
+
+      if (sortBy === "quantity") {
+        orderBy = orderFn(items.quantity);
+      } else if (sortBy === "createdAt") {
+        orderBy = orderFn(items.createdAt);
+      }
 
       const query = await db.transaction(async tx => {
         const [total] = await tx.select({ value: count() }).from(items);
-        const data = await tx.select().from(items);
+
+        const data = await tx
+          .select()
+          .from(items)
+          .where(and(...andFilter))
+          .orderBy(orderBy)
+          .offset(offset)
+          .limit(limit);
 
         return { total: total.value, data };
       });
